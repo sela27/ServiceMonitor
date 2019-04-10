@@ -25,15 +25,15 @@ def writeToStatusLog(old_process_dict , new_process_dict):
 	statuslog = open("Status_Log.txt" , "a")
 	for oldproc,info in old_process_dict.items():
 		if oldproc not in new_process_dict:
-			statuslog.write(str(oldproc) + str(info) + " has died\n")
 			statuslog.write("time: " + str(now) + "\n")
+			statuslog.write(str(oldproc) + str(info) + " has died\n")
 			print("pid: " +str(oldproc) +" "+ str(info) + " has died")
 			now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 	for newproc,info in new_process_dict.items():
 		if newproc not in old_process_dict:
-			statuslog.write(str(newproc) + str(info) + " was created\n")
 			statuslog.write("time: " + str(now) + "\n")
+			statuslog.write(str(newproc) + str(info) + " was created\n")
 			print("pid: " + str(newproc) + str(info) + " was created")
 			now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	statuslog.close()
@@ -51,21 +51,28 @@ if x == 1:
 	
 
 elif x == 2:
+	firstinput = raw_input("please insert first date in the following format : year-month-day hour:minute:second\n")
+	secondinput = raw_input("please insert second date (later than the first date) in the following format : year-month-day hour:minute:second\n")
 	try:
-		First = datetime.strptime(str(input("please insert first date in the following format : year-month-day hour:minute:second")) , "%Y-%m-%d %H:%M:%S")
-		Second = datetime.strptime(str(input("please insert second date (later than the first date) in the following format : year-month-day hour:minute:second")) , "%Y-%m-%d %H:%M:%S")
+		first = datetime.strptime(firstinput , "%Y-%m-%d %H:%M:%S")
+		second = datetime.strptime(secondinput , "%Y-%m-%d %H:%M:%S")
 	except ValueError:
 		print("ohh wrong format")
 	finally:
-		serviceList = open("Status_Log.txt" , "r")
-		for line in serviceList.readline():
+		statuslog = open("Status_Log.txt" , "r")
+		for line in statuslog.readline():
 			if line.startswith("time:"):
 				time = line[6:]
 				date = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
-				#check if date is after the given time and if so take this sample
+				line = statuslog.readline()
+				if date < second:
+					break
+				elif date <= first:
+					print(line)
 			else:
 				pass
-			
+		print("finish all event at the given time time")
+		statuslog.close()
 
 else:
 	print("WORNG")
