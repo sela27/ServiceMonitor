@@ -2,14 +2,15 @@ import psutil
 import time
 import os
 from time import gmtime, strftime
-import datetime
+#import datetime
+from datetime import datetime
 #import sys
 
 def writeToServiceList():
 	serviceList = open("serviceList" , "a")
 	serviceList.write("*******************************************************************\n")
 	#serviceList.write(strftime("%a, %d %b %Y %H:%M:%S \n", gmtime()))
-	serviceList.write(str(datetime.datetime.now()) + "\n")
+	serviceList.write(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\n")
 	for proc in psutil.process_iter():
 		try:
 			pinfo = proc.as_dict(attrs=['pid' ,'name', 'username' ,'status'])
@@ -25,21 +26,21 @@ def writeToServiceList():
 
 def writeToStatusLog(old_process_dict , new_process_dict):
 	#now = time.ctime(time.time())
-	now = datetime.datetime.now()
+	now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	statuslog = open("Status_Log.txt" , "a")
 	for oldproc,info in old_process_dict.items():
 		if oldproc not in new_process_dict:
 			statuslog.write(str(oldproc) + str(info) + " has died\n")
 			statuslog.write("time: " + str(now) + "\n")
 			print("pid: " +str(oldproc) +" "+ str(info) + " has died")
-			now = time.ctime(time.time())
+			now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 	for newproc,info in new_process_dict.items():
 		if newproc not in old_process_dict:
 			statuslog.write(str(newproc) + str(info) + " was created\n")
 			statuslog.write("time: " + str(now) + "\n")
 			print("pid: " + str(newproc) + str(info) + " was created")
-			now = time.ctime(time.time())
+			now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	statuslog.close()
 			
 
