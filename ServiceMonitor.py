@@ -2,14 +2,11 @@ import psutil
 import time
 import os
 from time import gmtime, strftime
-#import datetime
 from datetime import datetime
-#import sys
 
 def writeToServiceList():
 	serviceList = open("serviceList" , "a")
 	serviceList.write("*******************************************************************\n")
-	#serviceList.write(strftime("%a, %d %b %Y %H:%M:%S \n", gmtime()))
 	serviceList.write(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\n")
 	for proc in psutil.process_iter():
 		try:
@@ -18,14 +15,12 @@ def writeToServiceList():
 			pass
         	else:
 	        	serviceList.write(str(pinfo) + "\n")
-	#serviceList.write(str(psutil.test()))
 	serviceList.write("*******************************************************************\n")
 	serviceList.close()
 
 
 
 def writeToStatusLog(old_process_dict , new_process_dict):
-	#now = time.ctime(time.time())
 	now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 	statuslog = open("Status_Log.txt" , "a")
 	for oldproc,info in old_process_dict.items():
@@ -56,15 +51,20 @@ if x == 1:
 	
 
 elif x == 2:
-	#TODO: add input for dates
-	serviceList = open("Status_Log.txt" , "r")
-	for line in serviceList.readline():
-		if line.startswith("time:"):
-			time = line[6:]
-			date = datetime.datetime.strptime(line, '%Y-%m-%d %H:%M:%S.%f')
-			#check if date is after the given time and if so take this sample
-		else:
-			pass
+	try:
+		First = datetime.strptime(str(input("please insert first date in the following format : year-month-day hour:minute:second")) , "%Y-%m-%d %H:%M:%S")
+		Second = datetime.strptime(str(input("please insert second date (later than the first date) in the following format : year-month-day hour:minute:second")) , "%Y-%m-%d %H:%M:%S")
+	except ValueError:
+		print("ohh wrong format")
+	finally:
+		serviceList = open("Status_Log.txt" , "r")
+		for line in serviceList.readline():
+			if line.startswith("time:"):
+				time = line[6:]
+				date = datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+				#check if date is after the given time and if so take this sample
+			else:
+				pass
 			
 
 else:
