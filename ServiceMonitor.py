@@ -1,11 +1,13 @@
 import psutil
 import time
 import os
+import fcntl
 from time import gmtime, strftime
 from datetime import datetime
 
 def writeToServiceList():
         serviceList = open("serviceList" , "a")
+	fcntl.flock(serviceList , fcntl.LOCK_EX | fcntl.LOCK_NB)
         serviceList.write("*******************************************************************\n")
         serviceList.write(str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + "\n")
         for proc in psutil.process_iter():
@@ -16,6 +18,7 @@ def writeToServiceList():
                 else:
                         serviceList.write(str(pinfo) + "\n")
         serviceList.write("*******************************************************************\n")
+	fcntl.flock(serviceList , fcntl.LOCK_UN)
         serviceList.close()
 
 
@@ -23,6 +26,7 @@ def writeToServiceList():
 def writeToStatusLog(old_process_dict , new_process_dict):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         statuslog = open("Status_Log.txt" , "a")
+	fcntl.flock(statuslog , fcntl.LOCK_EX | fcntl.LOCK_NB)
         for oldproc,info in old_process_dict.items():
                 if oldproc not in new_process_dict:
                         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -37,6 +41,8 @@ def writeToStatusLog(old_process_dict , new_process_dict):
                         statuslog.write("time: " + str(now) + "\n")
                         statuslog.write(str(newproc) + str(info) + " was created\n")
                         print("pid: " + str(newproc) + str(info) + " was created")
+
+        fcntl.flock(statuslog , fcntl.LOCK_UN)
         statuslog.close()
 			
 
@@ -63,6 +69,7 @@ elif x == 2:
 		print("ohh wrong format")
 	finally:
 		statuslog = open("Status_Log.txt" , "r")
+                fcntl.flock(statuslog , fcntl.LOCK_EX | fcntl.LOCK_NB)
 		Listoflines = statuslog.readlines()
 		for line ,value in enumerate(Listoflines):
 			if Listoflines[line].startswith("time:"):
@@ -75,7 +82,8 @@ elif x == 2:
 					print(Listoflines[line])
 			else:
 				pass
-		print("finish all event at the given time time")
+		print("printed all event at the given time")
+                fcntl.flock(statuslog , fcntl.LOCK_UN)
 		statuslog.close()
 
 else:
